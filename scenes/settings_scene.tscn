@@ -138,6 +138,34 @@ layout_mode = 2
 text = "90%"
 label_settings = SubResource("LabelSettings_3")
 
+[node name="GameplaySection" type="VBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox"]
+layout_mode = 2
+
+[node name="GameplayLabel" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/GameplaySection"]
+layout_mode = 2
+text = "Gameplay Settings"
+label_settings = SubResource("LabelSettings_2")
+
+[node name="TextSpeed" type="HBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox/GameplaySection"]
+layout_mode = 2
+
+[node name="TextSpeedLabel" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/GameplaySection/TextSpeed"]
+layout_mode = 2
+text = "Text Speed:"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="TextSpeedSlider" type="HSlider" parent="SettingsUI/SettingsContainer/SettingsVBox/GameplaySection/TextSpeed"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 10.0
+step = 5.0
+value = 45.0
+
+[node name="TextSpeedValue" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/GameplaySection/TextSpeed"]
+layout_mode = 2
+text = "45"
+label_settings = SubResource("LabelSettings_3")
+
 [node name="GraphicsSection" type="VBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox"]
 layout_mode = 2
 

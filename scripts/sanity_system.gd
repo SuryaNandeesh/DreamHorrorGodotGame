@@ -298,7 +298,7 @@ func get_multiple_actions_preview(actions: Array) -> float:
 
 # Method to temporarily boost sanity (useful for story events)
 func temporary_sanity_boost(amount: float, duration: float = 10.0):
-	var old_sanity = current_sanity
+	var _old_sanity = current_sanity
 	modify_sanity(amount)
 	print("Temporary sanity boost: +", amount, " for ", duration, " seconds")
 	

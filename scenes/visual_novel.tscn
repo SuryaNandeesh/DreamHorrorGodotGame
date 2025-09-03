@@ -24,6 +24,91 @@ texture = ExtResource("2_0x0x0")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="Characters" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CharLeft" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.2
+anchor_right = 0.35
+anchor_bottom = 0.9
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharCenter" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.35
+anchor_top = 0.2
+anchor_right = 0.65
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharRight" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.65
+anchor_top = 0.2
+anchor_right = 0.95
+anchor_bottom = 0.9
+grow_horizontal = 0
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharLeft2" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.2
+anchor_right = 0.35
+anchor_bottom = 0.9
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharCenter2" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.35
+anchor_top = 0.2
+anchor_right = 0.65
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharRight2" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.65
+anchor_top = 0.2
+anchor_right = 0.95
+anchor_bottom = 0.9
+grow_horizontal = 0
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="RedOverlay" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -106,20 +191,79 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 2
 
-[node name="VNText" type="RichTextLabel" parent="."]
+[node name="DialogueContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="NameBackground" type="Panel" parent="DialogueContainer"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -240.0
+offset_right = 320.0
+offset_bottom = -200.0
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="NameLabel" type="Label" parent="DialogueContainer"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -240.0
+offset_right = 300.0
+offset_bottom = -200.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "Character Name"
+vertical_alignment = 1
+
+[node name="VNText" type="RichTextLabel" parent="DialogueContainer"]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = -220.0
-offset_right = -24.0
-offset_bottom = -24.0
+offset_top = -200.0
 grow_horizontal = 2
 grow_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/line_separation = 8
+theme_override_font_sizes/normal_font_size = 20
 bbcode_enabled = true
 autowrap_mode = 2
+
+[node name="TextBackground" type="Panel" parent="DialogueContainer/VNText"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Characters2" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="StartScreen" type="Control" parent="."]
 layout_mode = 1
@@ -306,60 +450,3 @@ text = "Settings"
 [node name="MainMenuButton" type="Button" parent="PauseOverlay/PauseContent/PauseButtons"]
 layout_mode = 2
 text = "Main Menu"
-
-[node name="Characters" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="CharLeft" type="TextureRect" parent="Characters"]
-visible = false
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 40.0
-offset_top = -300.0
-offset_right = 360.0
-offset_bottom = 100.0
-grow_horizontal = 0
-grow_vertical = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CharCenter" type="TextureRect" parent="Characters"]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -320.0
-offset_right = 160.0
-offset_bottom = 120.0
-grow_horizontal = 0
-grow_vertical = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CharRight" type="TextureRect" parent="Characters"]
-visible = false
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -360.0
-offset_top = -300.0
-offset_right = -40.0
-offset_bottom = 100.0
-grow_horizontal = 0
-grow_vertical = 2
-expand_mode = 1
-stretch_mode = 5

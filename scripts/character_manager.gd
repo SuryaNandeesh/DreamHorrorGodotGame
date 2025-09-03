@@ -1,9 +1,9 @@
 extends Node
 
-# Character manager for handling character interactions and combat initiation
+# Character manager for handling character interactions in the visual novel
 class_name CharacterManager
 
-# Character definitions with personalities and sanity thresholds
+# Character definitions with personalities and dialogue
 var characters: Dictionary = {
 	"daughter": {
 		"name": "Pincushion Daughter",
@@ -161,48 +161,24 @@ var characters: Dictionary = {
 	}
 }
 
-# Character relationship states
-var character_relationships: Dictionary = {}
-var character_sanity_levels: Dictionary = {}
-
-# Character locations and isolation tracking
+# Character locations
 var character_locations: Dictionary = {}
-var nearby_characters: Dictionary = {}
 
-# Sanity-based story paths
-var sanity_paths: Dictionary = {
-	"low_sanity": {
-		"unlocked_topics": ["drugs", "illegal_acts", "violence", "dark_secrets"],
-		"blocked_topics": ["family_values", "moral_guidance", "positive_outlook"],
-		"character_actions": {
-			"mother": "Hides weapons, becomes paranoid, suspicious of player",
-			"brother": "Withdraws completely, may avoid player",
-			"daughter": "Becomes aggressive, easily manipulated by others",
-			"father": "Irritable, may become confrontational",
-			"shopkeeper": "Reveals dark secrets, becomes more ominous and threatening"
-		}
+# Character dialogue paths
+var dialogue_paths: Dictionary = {
+	"casual": {
+		"mother": ["How was your day?", "Would you like something to eat?", "The weather is nice today."],
+		"brother": ["Hey, what's up?", "Want to hang out?", "Been busy with college stuff."],
+		"daughter": ["Hey there!", "What's new?", "Want to talk?"],
+		"father": ["How's it going, sport?", "Want to watch the game?", "Been working hard on the farm."],
+		"shopkeeper": ["Welcome!", "Looking for anything specific?", "Let me know if you need help."]
 	},
-	"medium_sanity": {
-		"unlocked_topics": ["casual_conversation", "family_matters", "daily_life"],
-		"blocked_topics": ["extreme_topics", "deep_secrets"],
-		"character_actions": {
-			"mother": "Normal behavior, some mystery maintained",
-			"brother": "Casual interaction, some distance",
-			"daughter": "Normal behavior, some vulnerability",
-			"father": "Normal behavior, tired but friendly",
-			"shopkeeper": "Normal mysterious behavior, helpful but enigmatic"
-		}
-	},
-	"high_sanity": {
-		"unlocked_topics": ["family_values", "moral_guidance", "positive_outlook", "deep_connections"],
-		"blocked_topics": ["drugs", "illegal_acts", "violence", "dark_secrets"],
-		"character_actions": {
-			"mother": "More open about past, trusting of player",
-			"brother": "More open, supportive, helpful",
-			"daughter": "Confident, protective, strong",
-			"father": "Very supportive, enthusiastic, open",
-			"shopkeeper": "More benevolent, shares wisdom and helpful knowledge"
-		}
+	"personal": {
+		"mother": ["I worry about you sometimes.", "The family means everything to me.", "We should spend more time together."],
+		"brother": ["College is tough but I'm managing.", "Sorry I've been distant.", "Things are getting better."],
+		"daughter": ["I'm trying my best.", "Thanks for being there.", "It's not easy, you know?"],
+		"father": ["Proud of this family.", "Working hard to provide.", "Always here if you need me."],
+		"shopkeeper": ["This town has many stories.", "Been here a long time.", "Seen many things change."]
 	}
 }
 
@@ -210,26 +186,14 @@ func _ready():
 	_initialize_character_states()
 
 func _initialize_character_states():
-	# Initialize all characters with medium sanity
+	# Initialize all characters
 	for character_id in characters.keys():
-		character_sanity_levels[character_id] = 50.0
-		character_relationships[character_id] = 50.0
 		character_locations[character_id] = "unknown"
-		nearby_characters[character_id] = []
 
-# Check if player is alone with a specific character
-func is_alone_with_character(character_id: String) -> bool:
-	if not nearby_characters.has(character_id):
-		return false
-	
-	# Player is alone with this character if no other characters are nearby
-	return nearby_characters[character_id].size() == 0
-
-# Update character location and nearby characters
-func update_character_location(character_id: String, location: String, nearby: Array = []):
+# Update character location
+func update_character_location(character_id: String, location: String):
 	if characters.has(character_id):
 		character_locations[character_id] = location
-		nearby_characters[character_id] = nearby
 
 # Get all characters at a specific location
 func get_characters_at_location(location: String) -> Array:
@@ -239,210 +203,18 @@ func get_characters_at_location(location: String) -> Array:
 			characters_at_location.append(character_id)
 	return characters_at_location
 
-# Check if combat can be initiated with a character
-func can_initiate_combat_with(character_id: String, player_sanity: float) -> Dictionary:
-	if not characters.has(character_id):
-		return {
-			"available": false,
-			"reason": "Character not found"
-		}
-	
-	var is_alone = is_alone_with_character(character_id)
-	var sanity_check = player_sanity < 3.0
-	
-	var can_combat = sanity_check and is_alone
-	var reason = ""
-	
-	if not can_combat:
-		if not sanity_check:
-			reason = "Your sanity is too high for combat. You need to be below 3% sanity."
-		elif not is_alone:
-			reason = "You can only initiate combat when alone with " + characters[character_id]["name"] + "."
-		else:
-			reason = "Combat is not available at this time."
-	
-	return {
-		"available": can_combat,
-		"reason": reason,
-		"character_name": characters[character_id]["name"],
-		"required_sanity": 3.0,
-		"current_sanity": player_sanity,
-		"is_alone": is_alone,
-		"location": character_locations.get(character_id, "unknown")
-	}
 
-# Get character dialogue with combat option if available
-func get_character_dialogue_with_combat(character_id: String, dialogue_type: String, player_sanity: float) -> Dictionary:
-	var dialogue = get_character_dialogue(character_id, dialogue_type)
-	var combat_status = can_initiate_combat_with(character_id, player_sanity)
-	
-	return {
-		"dialogue": dialogue,
-		"combat_available": combat_status.available,
-		"combat_reason": combat_status.reason,
-		"character_name": combat_status.character_name
-	}
-
-func get_character_sanity_level(character_id: String) -> float:
-	return character_sanity_levels.get(character_id, 50.0)
-
-func set_character_sanity(character_id: String, new_sanity: float):
-	character_sanity_levels[character_id] = clamp(new_sanity, 0.0, 100.0)
-	_emit_sanity_changed(character_id)
-
-func get_sanity_category(sanity_level: float) -> String:
-	if sanity_level < 30.0:
-		return "low_sanity"
-	elif sanity_level < 70.0:
-		return "medium_sanity"
-	else:
-		return "high_sanity"
 
 func get_character_dialogue(character_id: String, dialogue_type: String) -> String:
-	var character = characters.get(character_id, {})
-	if not character.has("dialogue_variants"):
+	if not dialogue_paths.has(dialogue_type) or not dialogue_paths[dialogue_type].has(character_id):
 		return "Hello."
 	
-	var sanity_level = get_character_sanity_level(character_id)
-	var sanity_category = get_sanity_category(sanity_level)
-	
-	var variants = character.dialogue_variants.get(sanity_category, {})
-	return variants.get(dialogue_type, "Hello.")
+	var dialogues = dialogue_paths[dialogue_type][character_id]
+	return dialogues[randi() % dialogues.size()]
 
-func can_discuss_topic(topic: String) -> bool:
-	# Try to get player sanity from various sources
-	var player_sanity = 50.0  # Default to medium
-	
-	# Try to get from GameManager if it exists
-	if Engine.has_singleton("GameManager"):
-		var game_manager = Engine.get_singleton("GameManager")
-		if game_manager.has("sanity_level"):
-			player_sanity = game_manager.sanity_level
-	
-	# Try to get from SanitySystem if it exists
-	if Engine.has_singleton("SanitySystem"):
-		var sanity_system = Engine.get_singleton("SanitySystem")
-		if sanity_system.has("get_current_sanity"):
-			player_sanity = sanity_system.get_current_sanity()
-	
-	var sanity_category = get_sanity_category(player_sanity)
-	var sanity_path = sanity_paths.get(sanity_category, {})
-	
-	var blocked_topics = sanity_path.get("blocked_topics", [])
-	return not blocked_topics.has(topic)
+func get_character_name(character_id: String) -> String:
+	return characters.get(character_id, {}).get("name", "Unknown")
 
-func get_character_action(character_id: String) -> String:
-	# Try to get player sanity from various sources
-	var player_sanity = 50.0  # Default to medium
-	
-	# Try to get from GameManager if it exists
-	if Engine.has_singleton("GameManager"):
-		var game_manager = Engine.get_singleton("GameManager")
-		if game_manager.has("sanity_level"):
-			player_sanity = game_manager.sanity_level
-	
-	# Try to get from SanitySystem if it exists
-	if Engine.has_singleton("SanitySystem"):
-		var sanity_system = Engine.get_singleton("SanitySystem")
-		if sanity_system.has("get_current_sanity"):
-			player_sanity = sanity_system.get_current_sanity()
-	
-	var sanity_category = get_sanity_category(player_sanity)
-	var sanity_path = sanity_paths.get(sanity_category, {})
-	
-	var character_actions = sanity_path.get("character_actions", {})
-	return character_actions.get(character_id, "Normal behavior")
-
-func get_character_relationship(character_id: String) -> float:
-	return character_relationships.get(character_id, 50.0)
-
-func modify_relationship(character_id: String, change: float):
-	var current = character_relationships.get(character_id, 50.0)
-	character_relationships[character_id] = clamp(current + change, 0.0, 100.0)
-
-func get_character_response_to_action(character_id: String, action: String) -> String:
-	var _character = characters.get(character_id, {})
-	var sanity_level = get_character_sanity_level(character_id)
-	var sanity_category = get_sanity_category(sanity_level)
-	
-	# Character-specific responses based on sanity and action
-	match character_id:
-		"daughter":
-			match action:
-				"bully":
-					if sanity_category == "low_sanity":
-						return "I... I don't know what to do..."
-					elif sanity_category == "high_sanity":
-						return "You really think you can push me around?"
-				"support":
-					if sanity_category == "low_sanity":
-						return "You... you really mean that?"
-					elif sanity_category == "high_sanity":
-						return "Thank you! I appreciate that."
-		
-		"brother":
-			match action:
-				"confront":
-					if sanity_category == "low_sanity":
-						return "I don't want to talk about it."
-					elif sanity_category == "high_sanity":
-						return "I know I've been distant. I'm trying to change."
-				"support":
-					if sanity_category == "low_sanity":
-						return "Why are you being nice to me?"
-					elif sanity_category == "high_sanity":
-						return "Thanks. I really needed that."
-		
-		"mother":
-			match action:
-				"question_past":
-					if sanity_category == "low_sanity":
-						return "I don't know what you're talking about!"
-					elif sanity_category == "high_sanity":
-						return "I suppose I could tell you a little..."
-				"trust":
-					if sanity_category == "low_sanity":
-						return "I... I'm not sure I can trust anyone."
-					elif sanity_category == "high_sanity":
-						return "I trust you completely."
-		
-		"father":
-			match action:
-				"confront":
-					if sanity_category == "low_sanity":
-						return "What are you accusing me of?"
-					elif sanity_category == "high_sanity":
-						return "I understand your concern. Let's talk."
-				"support":
-					if sanity_category == "low_sanity":
-						return "I don't need your help."
-					elif sanity_category == "high_sanity":
-						return "That means a lot to me, thank you."
-		
-		"shopkeeper":
-			match action:
-				"respect":
-					if sanity_category == "low_sanity":
-						return "Your politeness amuses me... for now."
-					elif sanity_category == "high_sanity":
-						return "A respectful customer. How refreshing."
-				"curiosity":
-					if sanity_category == "low_sanity":
-						return "Your curiosity will lead you to dark places."
-					elif sanity_category == "high_sanity":
-						return "Curiosity is a virtue. Let me show you something interesting."
-				"direct":
-					if sanity_category == "low_sanity":
-						return "Directness... I like that. But are you ready for the truth?"
-					elif sanity_category == "high_sanity":
-						return "Directness is indeed a virtue. What knowledge do you seek?"
-	
-	return "I don't know how to respond to that."
-
-func _emit_sanity_changed(character_id: String):
-	# Emit signal for character sanity change
-	character_sanity_changed.emit(character_id, get_character_sanity_level(character_id))
-
-# Signals
-signal character_sanity_changed(character_id: String, new_sanity: float)
-signal _relationship_changed(character_id: String, new_relationship: float)
+func get_character_description(character_id: String) -> String:
+	var character = characters.get(character_id, {})
+	return character.get("background", "No description available.")

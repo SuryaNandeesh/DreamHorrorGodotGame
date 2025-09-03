@@ -69,11 +69,11 @@ func _initialize_systems():
 
 func _initialize_character_locations():
 	# Set up initial character locations
-	character_manager.update_character_location("daughter", "bedroom", [])
-	character_manager.update_character_location("brother", "garage", [])
-	character_manager.update_character_location("mother", "kitchen", [])
-	character_manager.update_character_location("father", "living_room", [])
-	character_manager.update_character_location("shopkeeper", "shop", [])
+	character_manager.update_character_location("daughter", "bedroom")
+	character_manager.update_character_location("brother", "garage")
+	character_manager.update_character_location("mother", "kitchen")
+	character_manager.update_character_location("father", "living_room")
+	character_manager.update_character_location("shopkeeper", "shop")
 
 func _connect_ui():
 	# Action buttons
