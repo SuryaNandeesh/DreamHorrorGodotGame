@@ -148,6 +148,8 @@ godot-horror-game/
 
 This visual novel creates an immersive horror experience through storytelling and character interaction. The focus on narrative and atmosphere, combined with modern UI design and robust save system, provides players with an engaging and memorable experience.
 
+## **CREDIT FOR MUSIC**
 ---
+Dark despair guitar vibe by NomisYlad -- https://freesound.org/s/822772/ -- License: Attribution 4.0
 
 **Note**: This game focuses on psychological horror through storytelling rather than combat or action elements. The visual novel format allows for deep character development and atmospheric storytelling.
