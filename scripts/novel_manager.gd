@@ -31,6 +31,11 @@ extends Control
 var sanity_system: SanitySystem
 var character_manager: CharacterManager
 var save_system: SaveSystem
+var settings_system: SettingsSystem
+
+# Audio nodes
+@onready var music_player: AudioStreamPlayer = AudioStreamPlayer.new()
+var current_music: String = ""
 
 # Menu management
 var active_menu: Control = null
@@ -69,62 +74,119 @@ var dialogue_state = {
 # Visual novel dialogue structure
 var vn_dialogue = [
 	{
+		"id": "start",
+		"character": "none",
+		"text": "Your car sputters to a stop on the outskirts of a small town. The fuel gauge reads empty.",
+		"position": "center",
+		"choices": [
+			{"text": "Look around for help", "next": "look_around"},
+			{"text": "Check your phone", "next": "check_phone"}
+		]
+	},
+	{
+		"id": "check_phone",
+		"character": "none",
+		"text": "No signal. The screen shows only a single bar, flickering in and out.",
+		"position": "center",
+		"next": "look_around"
+	},
+	{
+		"id": "look_around",
+		"character": "none",
+		"text": "A small shop sits at the edge of town, its windows casting a warm glow in the evening light.",
+		"position": "center",
+		"next": "enter_shop"
+	},
+	{
+		"id": "enter_shop",
+		"character": "shopkeeper",
+		"text": "Welcome, stranger. Don't get many visitors out here. I'm Helena, I run this little shop.",
+		"position": "center",
+		"choices": [
+			{"text": "Ask about gas station", "next": "ask_gas"},
+			{"text": "Ask about town", "next": "ask_town"}
+		]
+	},
+	{
+		"id": "ask_gas",
+		"character": "shopkeeper",
+		"text": "Gas station's closed for the night. Owner's been... unreliable lately. Strange things happening.",
+		"position": "center",
+		"next": "meet_elena"
+	},
+	{
+		"id": "ask_town",
+		"character": "shopkeeper",
+		"text": "Ashford Valley. Small place, but... interesting. Been here longer than most can remember.",
+		"position": "center",
+		"next": "meet_elena"
+	},
+	{
+		"id": "meet_elena",
 		"character": "daughter",
-		"text": "Hey there! I've been waiting to talk to you.",
-		"position": "center"
+		"text": "Helena, do you have any more of those special candles? Mom asked me to- Oh, hello there.",
+		"position": "right",
+		"next": "elena_intro"
 	},
 	{
-		"character": "brother",
-		"text": "Oh, you're talking with her? Mind if I join in?",
-		"position": "right"
-	},
-	{
-		"character": "daughter",
-		"text": "I was just telling them about what happened at school.",
-		"position": "center"
-	},
-	{
-		"character": "brother",
-		"text": "Ah, right. That must have been tough.",
-		"position": "right"
-	},
-	{
-		"character": "daughter",
-		"text": "Yeah, but I'm handling it. Thanks for asking.",
-		"position": "center"
+		"id": "elena_intro",
+		"character": "shopkeeper",
+		"text": "Elena Ashford, meet our stranded visitor. Their car ran out of gas.",
+		"position": "left",
+		"choices": [
+			{"text": "Nice to meet you", "next": "elena_nice"},
+			{"text": "I need help", "next": "elena_help"}
+		]
 	}
 ]
+
+# Character name mappings
+var character_names = {
+	"none": "",
+	"daughter": "Elena Ashford",
+	"brother": "Marcus Ashford",
+	"father": "Richard Ashford",
+	"mother": "Catherine Ashford",
+	"shopkeeper": "Helena"
+}
 var vn_index: int = 0
 
 func _ready():
+	# Wait for nodes to be ready
+	await get_tree().process_frame
+	
 	# Set process mode for the entire scene
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	# Make sure UI elements can process while paused
-	pause_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
-	choices_container.process_mode = Node.PROCESS_MODE_ALWAYS
-	
-	# Set up pause overlay
-	pause_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	pause_overlay.visible = false
-	
-	# Make sure the pause overlay is on top
-	if pause_overlay.get_parent():
-		pause_overlay.get_parent().move_child(pause_overlay, -1)  # Move to last (top) position
-	
-	# Set pause overlay appearance
-	pause_overlay.self_modulate = Color(0.1, 0.1, 0.1, 0.9)  # Semi-transparent dark background
-	
-	# Set up pause menu buttons
-	var pause_content = pause_overlay.get_node("PauseContent")
-	if pause_content:
-		pause_content.mouse_filter = Control.MOUSE_FILTER_STOP
-		for button in pause_content.get_node("PauseButtons").get_children():
-			if button is Button:
-				button.mouse_filter = Control.MOUSE_FILTER_STOP
-	
+	# Initialize systems first
 	_initialize_systems()
+	
+	# Make sure UI elements can process while paused
+	if pause_overlay:
+		pause_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
+		pause_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+		pause_overlay.visible = false
+		pause_overlay.self_modulate = Color(0.1, 0.1, 0.1, 0.9)
+		
+		# Make sure the pause overlay is on top
+		if pause_overlay.get_parent():
+			pause_overlay.get_parent().move_child(pause_overlay, -1)
+		
+		# Set up pause menu buttons
+		var pause_content = pause_overlay.get_node("PauseContent")
+		if pause_content:
+			pause_content.mouse_filter = Control.MOUSE_FILTER_STOP
+			for button in pause_content.get_node("PauseButtons").get_children():
+				if button is Button:
+					button.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	if choices_container:
+		choices_container.process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	# Connect UI after nodes are ready
 	_connect_ui()
+	
+	# Show start screen
 	_show_start()
 
 func _connect_ui():
@@ -256,7 +318,12 @@ func _show_vn_line():
 	var line = vn_dialogue[vn_index]
 	
 	# Store the full text and reset animation state
-	dialogue_state.current_text = line.text + ("\n\n▼" if vn_index < vn_dialogue.size() - 1 else "\n\n■")
+	var end_marker = "■"
+	if line.has("choices"):
+		end_marker = "▼"
+	elif line.has("next"):
+		end_marker = "▼"
+	dialogue_state.current_text = line.text + "\n\n" + end_marker
 	dialogue_state.visible_characters = 0
 	dialogue_state.is_text_completed = false
 	dialogue_state.is_skipping = false
@@ -274,32 +341,42 @@ func _show_vn_line():
 	
 	# Show character portrait
 	_hide_all_characters()
-	var char_image = load("res://images/" + line.character + ".png")
-	match line.position:
-		"left":
-			if char_left:
-				char_left.texture = char_image
-				char_left.visible = true
-		"center":
-			if char_center:
-				char_center.texture = char_image
-				char_center.visible = true
-		"right":
-			if char_right:
-				char_right.texture = char_image
-				char_right.visible = true
+	if line.character != "none":
+		var char_image = load("res://images/" + line.character + ".png")
+		match line.position:
+			"left":
+				if char_left:
+					char_left.texture = char_image
+					char_left.visible = true
+			"center":
+				if char_center:
+					char_center.texture = char_image
+					char_center.visible = true
+			"right":
+				if char_right:
+					char_right.texture = char_image
+					char_right.visible = true
 	
 	# Show character name
 	if name_label and name_background:
-		name_label.text = character_manager.get_character_name(line.character)
-		name_label.visible = true
-		name_background.visible = true
+		name_label.text = character_names[line.character]
+		name_label.visible = line.character != "none"
+		name_background.visible = line.character != "none"
 		name_label.modulate.a = dialogue_state.current_fade  # Apply fade to name label
 		name_background.modulate.a = dialogue_state.current_fade  # Apply fade to name background
 	
 	# Clear any existing choices
 	for child in choices_container.get_children():
 		child.queue_free()
+	
+	# Show choices if available
+	if line.has("choices"):
+		for choice in line.choices:
+			var button = Button.new()
+			button.text = choice.text
+			button.pressed.connect(func(): _on_choice_selected(choice.next))
+			choices_container.add_child(button)
+		choices_container.visible = true
 	
 	# Make sure UI is visible
 	vn_text.visible = dialogue_state.dialogue_visible
@@ -317,9 +394,38 @@ func _hide_all_characters():
 		name_background.visible = false
 
 func _next_vn_line():
+	var line = vn_dialogue[vn_index]
+	
+	# If this line has choices and they're not shown yet, show them
+	if line.has("choices") and not choices_container.visible:
+		choices_container.visible = true
+		return
+	
+	# If choices are visible, don't advance
+	if choices_container.visible:
+		return
+	
+	# If this line has a next ID, jump to that line
+	if line.has("next"):
+		_jump_to_line(line.next)
+		return
+	
+	# Otherwise, go to next sequential line
 	vn_index += 1
 	dialogue_state.current_index = vn_index
 	_show_vn_line()
+
+func _jump_to_line(id: String):
+	for i in range(vn_dialogue.size()):
+		if vn_dialogue[i].id == id:
+			vn_index = i
+			dialogue_state.current_index = vn_index
+			_show_vn_line()
+			return
+
+func _on_choice_selected(next_id: String):
+	choices_container.visible = false
+	_jump_to_line(next_id)
 
 func _initialize_systems():
 	sanity_system = SanitySystem.new()
@@ -335,9 +441,14 @@ func _initialize_systems():
 	add_child(save_system)
 	
 	# Initialize settings system
-	var settings_system = SettingsSystem.new()
+	settings_system = SettingsSystem.new()
 	settings_system.name = "SettingsSystem"
 	add_child(settings_system)
+	
+	# Initialize audio system
+	add_child(music_player)
+	music_player.bus = "Music"
+	_update_music_volume()
 	
 	# Load text speed from settings
 	dialogue_state.animation_speed = settings_system.get_gameplay_setting("text_speed")
@@ -346,10 +457,38 @@ func _initialize_systems():
 	settings_system.setting_changed.connect(_on_setting_changed)
 	sanity_system.sanity_changed.connect(_on_sanity_changed)
 	print("Novel systems initialized successfully")
+	
+	# Start background music
+	_play_music("res://audio/music/main_theme.ogg")
 
 func _on_setting_changed(category: String, setting: String, value):
 	if category == "gameplay" and setting == "text_speed":
 		dialogue_state.animation_speed = value
+	elif category == "audio":
+		if setting == "music_volume" or setting == "master_volume":
+			_update_music_volume()
+		elif setting == "enable_music":
+			music_player.stream_paused = !value
+
+func _update_music_volume():
+	if settings_system and music_player:
+		var master_volume = settings_system.get_audio_volume("master")
+		var music_volume = settings_system.get_audio_volume("music")
+		var music_enabled = settings_system.is_audio_enabled("music")
+		music_player.volume_db = linear_to_db(master_volume * music_volume)
+		music_player.stream_paused = !music_enabled
+
+func _play_music(path: String):
+	if path == current_music:
+		return
+		
+	current_music = path
+	if ResourceLoader.exists(path):
+		var stream = load(path)
+		if stream:
+			music_player.stream = stream
+			music_player.play()
+			_update_music_volume()
 
 func _on_sanity_changed(new_sanity: float, _old_sanity: float):
 	player_sanity = new_sanity
@@ -504,22 +643,20 @@ func _show_save_load_screen(is_save: bool):
 		
 		# Create save callback
 		var save_callback = func():
-			var success = save_system.save_game(current_slot)
-			if success:
+			if save_system.save_game(current_slot):
 				dlg.queue_free()
 				_show_message("Game saved to slot " + str(current_slot))
-			if not success:
+			else:
 				_show_message("Failed to save game!")
 		
 		# Create load callback
 		var load_callback = func():
-			var success = save_system.load_game(current_slot)
-			if success:
+			if save_system.load_game(current_slot):
 				dlg.queue_free()
 				_show_message("Game loaded from slot " + str(current_slot))
 				get_tree().paused = false
 				_show_vn_demo()  # Restart VN with loaded data
-			if not success:
+			else:
 				_show_message("Failed to load game!")
 		
 		# Connect appropriate callback
@@ -533,13 +670,12 @@ func _show_save_load_screen(is_save: bool):
 			
 			# Create delete callback
 			var delete_callback = func():
-				var success = save_system.delete_save(current_slot)
-				if success:
+				if save_system.delete_save(current_slot):
 					label.text = "Slot " + str(current_slot) + " - Empty"
 					btn.disabled = !is_save
 					del_btn.queue_free()
 					_show_message("Save deleted!")
-				if not success:
+				else:
 					_show_message("Failed to delete save!")
 			
 			del_btn.pressed.connect(delete_callback)
@@ -615,7 +751,6 @@ func _process(delta: float):
 				dialogue_state.visible_characters = dialogue_state.current_text.length()
 				dialogue_state.is_text_completed = true
 				vn_text.visible_characters = -1  # Show all characters
-				dialogue_state.fade_timer = 2.0  # Start fade out timer
 			else:
 				vn_text.visible_characters = dialogue_state.visible_characters
 	
@@ -632,11 +767,8 @@ func _process(delta: float):
 		name_label.modulate.a = dialogue_state.current_fade
 		name_background.modulate.a = dialogue_state.current_fade
 	
-	# Handle fade out timer
-	if dialogue_state.fade_timer > 0:
-		dialogue_state.fade_timer -= delta
-		if dialogue_state.fade_timer <= 0:
-			dialogue_state.target_fade = 0.0  # Start fade out
+	# Keep dialogue visible
+	dialogue_state.target_fade = 1.0
 
 func _can_advance_dialogue() -> bool:
 	# Can only advance if text animation is complete or text animation is disabled
