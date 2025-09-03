@@ -1,0 +1,365 @@
+[gd_scene load_steps=3 format=3 uid="uid://plphihtnnpsg"]
+
+[ext_resource type="Script" uid="uid://djfsk17wdoc1i" path="res://scripts/novel_manager.gd" id="1_0x0x0"]
+[ext_resource type="Texture2D" uid="uid://b7t3k5wtla08m" path="res://images/backgroundfarm.png" id="2_0x0x0"]
+
+[node name="VisualNovel" type="Control"]
+process_mode = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0x0x0")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_0x0x0")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RedOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 0, 0)
+
+[node name="Choices" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.8
+offset_left = -200.0
+offset_right = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DialoguePanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -220.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="CharacterImage" type="TextureRect" parent="DialoguePanel"]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 200.0
+offset_bottom = 172.0
+grow_horizontal = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Speaker" type="Label" parent="DialoguePanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.001
+anchor_top = -0.132
+anchor_right = 0.001
+anchor_bottom = -0.132
+offset_left = -0.28
+offset_top = 0.039999
+offset_right = 179.72
+offset_bottom = 28.04
+grow_horizontal = 0
+
+[node name="Text" type="Label" parent="DialoguePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_right = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+autowrap_mode = 2
+
+[node name="RichText" type="RichTextLabel" parent="DialoguePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 220.0
+offset_top = 48.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 2
+
+[node name="VNText" type="RichTextLabel" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -220.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+bbcode_enabled = true
+autowrap_mode = 2
+
+[node name="StartScreen" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartContainer" type="VBoxContainer" parent="StartScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="StartScreen/StartContainer"]
+layout_mode = 2
+text = "Dream Reality Horror"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="StartScreen/StartContainer"]
+layout_mode = 2
+text = "Start Story"
+
+[node name="TestMenuButton" type="Button" parent="StartScreen/StartContainer"]
+layout_mode = 2
+text = "Test Character System"
+
+[node name="QuitButton" type="Button" parent="StartScreen/StartContainer"]
+layout_mode = 2
+text = "Quit"
+
+[node name="SaveScreen" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SavePanel" type="Panel" parent="SaveScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -80.0
+offset_right = 220.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SaveVBox" type="VBoxContainer" parent="SaveScreen/SavePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SaveTitle" type="Label" parent="SaveScreen/SavePanel/SaveVBox"]
+layout_mode = 2
+text = "Save"
+horizontal_alignment = 1
+
+[node name="SaveSubtitle" type="Label" parent="SaveScreen/SavePanel/SaveVBox"]
+layout_mode = 2
+text = "Coming soon"
+horizontal_alignment = 1
+
+[node name="SaveBackButton" type="Button" parent="SaveScreen/SavePanel/SaveVBox"]
+layout_mode = 2
+text = "Back"
+
+[node name="GameOverScreen" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameOverPanel" type="Panel" parent="GameOverScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameOverVBox" type="VBoxContainer" parent="GameOverScreen/GameOverPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="GameOverTitle" type="Label" parent="GameOverScreen/GameOverPanel/GameOverVBox"]
+layout_mode = 2
+text = "Game Over"
+horizontal_alignment = 1
+
+[node name="GameOverButtons" type="HBoxContainer" parent="GameOverScreen/GameOverPanel/GameOverVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GameOverRestartButton" type="Button" parent="GameOverScreen/GameOverPanel/GameOverVBox/GameOverButtons"]
+layout_mode = 2
+text = "Restart"
+
+[node name="GameOverQuitButton" type="Button" parent="GameOverScreen/GameOverPanel/GameOverVBox/GameOverButtons"]
+layout_mode = 2
+text = "Quit"
+
+[node name="PauseOverlay" type="Panel" parent="."]
+process_mode = 2
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PauseContent" type="VBoxContainer" parent="PauseOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -120.0
+offset_right = 150.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PauseTitle" type="Label" parent="PauseOverlay/PauseContent"]
+layout_mode = 2
+text = "Paused"
+horizontal_alignment = 1
+
+[node name="PauseButtons" type="VBoxContainer" parent="PauseOverlay/PauseContent"]
+layout_mode = 2
+
+[node name="ResumeButton" type="Button" parent="PauseOverlay/PauseContent/PauseButtons"]
+layout_mode = 2
+text = "Resume"
+
+[node name="SettingsButton" type="Button" parent="PauseOverlay/PauseContent/PauseButtons"]
+layout_mode = 2
+text = "Settings"
+
+[node name="MainMenuButton" type="Button" parent="PauseOverlay/PauseContent/PauseButtons"]
+layout_mode = 2
+text = "Main Menu"
+
+[node name="Characters" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CharLeft" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 40.0
+offset_top = -300.0
+offset_right = 360.0
+offset_bottom = 100.0
+grow_horizontal = 0
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharCenter" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -320.0
+offset_right = 160.0
+offset_bottom = 120.0
+grow_horizontal = 0
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharRight" type="TextureRect" parent="Characters"]
+visible = false
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -300.0
+offset_right = -40.0
+offset_bottom = 100.0
+grow_horizontal = 0
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5

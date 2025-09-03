@@ -1,0 +1,176 @@
+[gd_scene load_steps=5 format=3 uid="uid://biubxtu5u8vsl"]
+
+[ext_resource type="Script" uid="uid://bjfhijdot865x" path="res://scripts/settings_scene.gd" id="1_settings"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 32
+font_color = Color(0.9, 0.9, 0.9, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 20
+font_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_3"]
+font_color = Color(0.7, 0.7, 0.8, 1)
+
+[node name="SettingsScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.08, 1)
+
+[node name="SettingsUI" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="SettingsUI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.05
+anchor_right = 0.5
+anchor_bottom = 0.05
+offset_left = -100.0
+offset_right = 100.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Settings"
+label_settings = SubResource("LabelSettings_1")
+horizontal_alignment = 1
+
+[node name="SettingsContainer" type="ScrollContainer" parent="SettingsUI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.15
+anchor_right = 0.5
+anchor_bottom = 0.85
+offset_left = -400.0
+offset_right = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SettingsVBox" type="VBoxContainer" parent="SettingsUI/SettingsContainer"]
+layout_mode = 2
+
+[node name="AudioSection" type="VBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox"]
+layout_mode = 2
+
+[node name="AudioLabel" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection"]
+layout_mode = 2
+text = "Audio Settings"
+label_settings = SubResource("LabelSettings_2")
+
+[node name="MasterVolume" type="HBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection"]
+layout_mode = 2
+
+[node name="MasterVolumeLabel" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/MasterVolume"]
+layout_mode = 2
+text = "Master Volume:"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="MasterVolumeSlider" type="HSlider" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/MasterVolume"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.1
+value = 1.0
+
+[node name="MasterVolumeValue" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/MasterVolume"]
+layout_mode = 2
+text = "100%"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="MusicVolume" type="HBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection"]
+layout_mode = 2
+
+[node name="MusicVolumeLabel" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/MusicVolume"]
+layout_mode = 2
+text = "Music Volume:"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="MusicVolumeSlider" type="HSlider" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/MusicVolume"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.1
+value = 0.8
+
+[node name="MusicVolumeValue" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/MusicVolume"]
+layout_mode = 2
+text = "80%"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="SFXVolume" type="HBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection"]
+layout_mode = 2
+
+[node name="SFXVolumeLabel" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/SFXVolume"]
+layout_mode = 2
+text = "SFX Volume:"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="SFXVolumeSlider" type="HSlider" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/SFXVolume"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.1
+value = 0.9
+
+[node name="SFXVolumeValue" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/AudioSection/SFXVolume"]
+layout_mode = 2
+text = "90%"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="GraphicsSection" type="VBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox"]
+layout_mode = 2
+
+[node name="GraphicsLabel" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/GraphicsSection"]
+layout_mode = 2
+text = "Graphics Settings"
+label_settings = SubResource("LabelSettings_2")
+
+[node name="Fullscreen" type="HBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox/GraphicsSection"]
+layout_mode = 2
+
+[node name="FullscreenLabel" type="Label" parent="SettingsUI/SettingsContainer/SettingsVBox/GraphicsSection/Fullscreen"]
+layout_mode = 2
+text = "Fullscreen:"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="FullscreenCheckBox" type="CheckBox" parent="SettingsUI/SettingsContainer/SettingsVBox/GraphicsSection/Fullscreen"]
+layout_mode = 2
+
+[node name="ButtonSection" type="HBoxContainer" parent="SettingsUI/SettingsContainer/SettingsVBox"]
+layout_mode = 2
+
+[node name="ResetDefaultsButton" type="Button" parent="SettingsUI/SettingsContainer/SettingsVBox/ButtonSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reset to Defaults"
+
+[node name="SaveButton" type="Button" parent="SettingsUI/SettingsContainer/SettingsVBox/ButtonSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save Settings"
+
+[node name="BackButton" type="Button" parent="SettingsUI/SettingsContainer/SettingsVBox/ButtonSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Back to Main Menu"

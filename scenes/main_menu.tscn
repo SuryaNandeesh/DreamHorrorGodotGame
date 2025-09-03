@@ -1,0 +1,115 @@
+[gd_scene load_steps=5 format=3 uid="uid://bqxqxqxqxqxqx"]
+
+[ext_resource type="Script" uid="uid://ds3x3khdfnc8v" path="res://scripts/main_menu.gd" id="1_0"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 48
+font_color = Color(0.9, 0.9, 0.9, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 18
+font_color = Color(0.7, 0.7, 0.8, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_3"]
+font_size = 14
+font_color = Color(0.6, 0.6, 0.7, 1)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.08, 1)
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.1
+anchor_right = 0.5
+anchor_bottom = 0.1
+offset_left = -200.0
+offset_right = 200.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Family Horror Game"
+label_settings = SubResource("LabelSettings_1")
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.2
+anchor_right = 0.5
+anchor_bottom = 0.2
+offset_left = -300.0
+offset_right = 300.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "A psychological horror game where your sanity affects the story"
+label_settings = SubResource("LabelSettings_2")
+horizontal_alignment = 1
+
+[node name="MainButtons" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.4
+anchor_right = 0.5
+anchor_bottom = 0.4
+offset_left = -100.0
+offset_top = -100.0
+offset_right = 100.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartButton" type="Button" parent="MainButtons"]
+layout_mode = 2
+text = "Start Game"
+
+[node name="LoadButton" type="Button" parent="MainButtons"]
+layout_mode = 2
+text = "Load Game"
+
+[node name="DeleteSaveButton" type="Button" parent="MainButtons"]
+layout_mode = 2
+text = "Delete Save"
+
+[node name="SettingsButton" type="Button" parent="MainButtons"]
+layout_mode = 2
+text = "Settings"
+
+[node name="QuitButton" type="Button" parent="MainButtons"]
+layout_mode = 2
+text = "Quit Game"
+
+[node name="SaveInfo" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.7
+anchor_right = 0.5
+anchor_bottom = 0.7
+offset_left = -200.0
+offset_right = 200.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "No save file found"
+label_settings = SubResource("LabelSettings_3")
+horizontal_alignment = 1
