@@ -3,8 +3,8 @@
 A psychological horror visual novel built in Godot 4, focusing on family dynamics and mysterious events in a small town.
 
 ## 👥 **Team Members**
-- [Your name/username] - Lead Developer
-- [Add other team members and their roles]
+- [Surya Nandeesh] - Lead Developer
+- [Felipe Gonzales] - Lead Artist (not AI)
 
 ## 📸 **Screenshots**
 ![Main Menu](screenshots/main_menu.png)
