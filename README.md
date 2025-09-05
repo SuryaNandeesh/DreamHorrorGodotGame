@@ -1,4 +1,4 @@
-# 📚 Visual Novel Horror Game
+# 📚 Enigma Escape
 
 A psychological horror visual novel built in Godot 4, focusing on family dynamics and mysterious events in a small town.
 
