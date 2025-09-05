@@ -15,21 +15,64 @@ extends Control
 @onready var back_button: Button = $SettingsUI/SettingsContainer/SettingsVBox/ButtonSection/BackButton
 
 # Settings system
-var settings_system: SettingsSystem
+@onready var settings_system := get_node("/root/SettingsSystem")
 
 func _ready():
-	_initialize_settings_system()
+	# Make sure settings UI can be interacted with
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	# Make sure the settings UI root is interactive
+	var settings_ui = get_node("SettingsUI")
+	settings_ui.process_mode = Node.PROCESS_MODE_ALWAYS
+	settings_ui.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# Make the container interactive
+	var settings_container = settings_ui.get_node("SettingsContainer")
+	settings_container.process_mode = Node.PROCESS_MODE_ALWAYS
+	settings_container.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# Make all UI elements interactive
+	for child in get_node("SettingsUI/SettingsContainer/SettingsVBox").get_children():
+		child.process_mode = Node.PROCESS_MODE_ALWAYS
+		child.mouse_filter = Control.MOUSE_FILTER_STOP
+		# Make all children of sections interactive too
+		for grandchild in child.get_children():
+			grandchild.process_mode = Node.PROCESS_MODE_ALWAYS
+			grandchild.mouse_filter = Control.MOUSE_FILTER_STOP
+			# Make all controls in containers interactive
+			if grandchild is Container:
+				for control in grandchild.get_children():
+					control.process_mode = Node.PROCESS_MODE_ALWAYS
+					control.mouse_filter = Control.MOUSE_FILTER_STOP
+	
 	_setup_ui()
 	_connect_ui()
 	_load_current_settings()
 
-func _initialize_settings_system():
-	settings_system = SettingsSystem.new()
-	settings_system.name = "SettingsSystem"
-	add_child(settings_system)
-
 func _setup_ui():
-	pass
+	# Set up audio sliders
+	master_volume_slider.mouse_filter = Control.MOUSE_FILTER_STOP
+	master_volume_slider.step = 0.01
+	master_volume_slider.min_value = 0.0
+	master_volume_slider.max_value = 1.0
+	
+	music_volume_slider.mouse_filter = Control.MOUSE_FILTER_STOP
+	music_volume_slider.step = 0.01
+	music_volume_slider.min_value = 0.0
+	music_volume_slider.max_value = 1.0
+	
+	sfx_volume_slider.mouse_filter = Control.MOUSE_FILTER_STOP
+	sfx_volume_slider.step = 0.01
+	sfx_volume_slider.min_value = 0.0
+	sfx_volume_slider.max_value = 1.0
+	
+	# Set up fullscreen checkbox
+	fullscreen_checkbox.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# Set up buttons
+	reset_defaults_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	save_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	back_button.mouse_filter = Control.MOUSE_FILTER_STOP
 
 func _connect_ui():
 	# Audio sliders
@@ -87,7 +130,23 @@ func _on_save_settings():
 	print("Settings saved successfully")
 
 func _on_back_to_main():
-	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	# Get the previous scene from Global
+	var global = get_node("/root/Global")
+	var previous_scene = global.get_previous_scene()
+	
+	# Check if we should return to a paused game
+	if previous_scene.contains("?paused=true"):
+		previous_scene = previous_scene.split("?")[0]  # Remove the query parameter
+		# We'll set up the pause state after changing scene
+		get_tree().change_scene_to_file(previous_scene)
+		await get_tree().process_frame  # Wait for scene to change
+		get_tree().paused = true
+		# Get the game world node and show its pause menu
+		var game_world = get_tree().current_scene
+		if game_world and game_world.has_method("_toggle_menu"):
+			game_world._toggle_menu()
+	else:
+		get_tree().change_scene_to_file(previous_scene)
 
 func _input(event):
 	if event is InputEventKey and event.pressed:

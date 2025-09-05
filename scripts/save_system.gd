@@ -1,7 +1,7 @@
 extends Node
 
 # Save system for managing game state persistence
-class_name SaveSystem
+# This is an autoload singleton, do not use class_name
 
 # Save file path (base)
 const SAVE_FILE_BASE = "user://savegame"

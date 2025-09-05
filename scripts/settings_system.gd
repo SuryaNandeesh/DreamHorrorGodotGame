@@ -1,7 +1,7 @@
 extends Node
 
 # Settings system for managing game configuration
-class_name SettingsSystem
+# This is an autoload singleton, do not use class_name
 
 # Settings categories
 enum SettingCategory {AUDIO, GRAPHICS, CONTROLS, GAMEPLAY, ACCESSIBILITY}

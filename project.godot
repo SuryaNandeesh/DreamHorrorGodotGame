@@ -21,6 +21,9 @@ config/icon="res://icon.svg"
 
 Global="*res://scripts/global.gd"
 SaveSystem="*res://scripts/save_system.gd"
+SettingsSystem="*res://scripts/settings_system.gd"
+CharacterManager="*res://scripts/character_manager.gd"
+SanitySystem="*res://scripts/sanity_system.gd"
 
 [display]
 

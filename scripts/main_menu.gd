@@ -9,31 +9,15 @@ extends Control
 @onready var delete_save_button: Button = $MainButtons/DeleteSaveButton
 
 # Systems
-@onready var save_system = get_node("/root/SaveSystem")
-var settings_system: SettingsSystem
-var character_manager: CharacterManager
-var sanity_system: SanitySystem
+@onready var save_system := get_node("/root/SaveSystem")
+@onready var settings_system := get_node("/root/SettingsSystem")
+@onready var character_manager := get_node("/root/CharacterManager")
+@onready var sanity_system := get_node("/root/SanitySystem")
 
 func _ready():
-	_initialize_systems()
 	_connect_ui()
 	_update_save_info()
-
-func _initialize_systems():
-	# Initialize all systems except SaveSystem (now autoloaded)
-	settings_system = SettingsSystem.new()
-	settings_system.name = "SettingsSystem"
-	add_child(settings_system)
-	
-	character_manager = CharacterManager.new()
-	character_manager.name = "CharacterManager"
-	add_child(character_manager)
-	
-	sanity_system = SanitySystem.new()
-	sanity_system.name = "SanitySystem"
-	add_child(sanity_system)
-	
-	print("Main menu systems initialized successfully")
+	print("Main menu initialized successfully")
 
 func _connect_ui():
 	start_button.pressed.connect(_on_start)
@@ -87,7 +71,7 @@ func _on_load():
 	
 	var any_save := false
 	for slot in range(1, save_system.MAX_SLOTS + 1):
-		var info := save_system.get_save_info(slot)
+		var info: Dictionary = save_system.get_save_info(slot)
 		var btn := Button.new()
 		var label := "Load Slot " + str(slot)
 		if info.exists:
@@ -126,7 +110,7 @@ func _on_delete_save():
 	
 	var any_save := false
 	for slot in range(1, save_system.MAX_SLOTS + 1):
-		var info := save_system.get_save_info(slot)
+		var info: Dictionary = save_system.get_save_info(slot)
 		var btn := Button.new()
 		var label := "Delete Slot " + str(slot)
 		if info.exists:
@@ -170,7 +154,7 @@ func _input(event):
 				# Find the most recent save slot
 				var latest_time := 0
 				for slot in range(1, save_system.MAX_SLOTS + 1):
-					var info := save_system.get_save_info(slot)
+					var info: Dictionary = save_system.get_save_info(slot)
 					if info.exists:
 						var save_time = Time.get_unix_time_from_datetime_string(info.save_date)
 						if save_time > latest_time:
@@ -188,7 +172,7 @@ func _input(event):
 				var latest_slot := -1
 				var latest_time := 0
 				for slot in range(1, save_system.MAX_SLOTS + 1):
-					var info := save_system.get_save_info(slot)
+					var info: Dictionary = save_system.get_save_info(slot)
 					if info.exists:
 						var save_time = Time.get_unix_time_from_datetime_string(info.save_date)
 						if save_time > latest_time:

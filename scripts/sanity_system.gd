@@ -1,7 +1,7 @@
 extends Node
 
 # Sanity system that affects story paths and character interactions
-class_name SanitySystem
+# This is an autoload singleton, do not use class_name
 
 # Sanity levels and their effects
 enum SanityLevel {INSANE, LOW, MEDIUM, HIGH, PURE}

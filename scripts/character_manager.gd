@@ -1,7 +1,7 @@
 extends Node
 
 # Character manager for handling character interactions in the visual novel
-class_name CharacterManager
+# This is an autoload singleton, do not use class_name
 
 # Character definitions with personalities and dialogue
 var characters: Dictionary = {

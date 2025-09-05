@@ -28,10 +28,10 @@ extends Control
 @onready var char_right: TextureRect = get_node_or_null("Characters/CharRight")
 
 # Systems used in VN-only flow
-var sanity_system: SanitySystem
-var character_manager: CharacterManager
-var save_system: SaveSystem
-var settings_system: SettingsSystem
+@onready var sanity_system := get_node("/root/SanitySystem")
+@onready var character_manager := get_node("/root/CharacterManager")
+@onready var save_system := get_node("/root/SaveSystem")
+@onready var settings_system := get_node("/root/SettingsSystem")
 
 # Audio nodes
 @onready var music_player: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -137,6 +137,134 @@ var vn_dialogue = [
 			{"text": "Nice to meet you", "next": "elena_nice"},
 			{"text": "I need help", "next": "elena_help"}
 		]
+	},
+	{
+		"id": "elena_nice",
+		"character": "daughter",
+		"text": "Nice to meet you too! Sorry about your car. You know... our house isn't far from here. Maybe you could stay the night?",
+		"position": "right",
+		"next": "helena_warning"
+	},
+	{
+		"id": "elena_help",
+		"character": "daughter",
+		"text": "Oh, you poor thing. Stuck here at night... Listen, we have a spare room at our house. It's not much, but it's better than sleeping in your car.",
+		"position": "right",
+		"next": "helena_warning"
+	},
+	{
+		"id": "helena_warning",
+		"character": "shopkeeper",
+		"text": "Elena... are you sure that's wise? Your mother...",
+		"position": "left",
+		"next": "elena_insists"
+	},
+	{
+		"id": "elena_insists",
+		"character": "daughter",
+		"text": "Mom will understand. Besides, it's not safe out here at night. Not anymore.",
+		"position": "right",
+		"choices": [
+			{"text": "What do you mean, not safe?", "next": "ask_safety"},
+			{"text": "Accept the offer", "next": "accept_stay"}
+		]
+	},
+	{
+		"id": "ask_safety",
+		"character": "daughter",
+		"text": "Oh, just... wild animals. And the weather can get pretty bad. Nothing to worry about really...",
+		"position": "right",
+		"next": "helena_concerned"
+	},
+	{
+		"id": "accept_stay",
+		"character": "daughter",
+		"text": "Great! Let me just get these candles and we can head over. It's only a ten-minute walk.",
+		"position": "right",
+		"next": "helena_concerned"
+	},
+	{
+		"id": "helena_concerned",
+		"character": "shopkeeper",
+		"text": "Just... be careful. And Elena? Tell your mother I'll be by tomorrow with those... items she requested.",
+		"position": "left",
+		"next": "leave_shop"
+	},
+	{
+		"id": "leave_shop",
+		"character": "none",
+		"text": "You follow Elena out of the shop. The sun has almost set, casting long shadows across the empty street. In the distance, you hear what sounds like... humming?",
+		"position": "center",
+		"choices": [
+			{"text": "Ask Elena about the humming", "next": "ask_humming"},
+			{"text": "Stay quiet", "next": "walk_quiet"}
+		]
+	},
+	{
+		"id": "ask_humming",
+		"character": "daughter",
+		"text": "Humming? I don't... oh, that. That's probably just the wind in the old factory pipes. Nothing to worry about. Let's hurry though.",
+		"position": "right",
+		"next": "approach_house"
+	},
+	{
+		"id": "walk_quiet",
+		"character": "daughter",
+		"text": "You notice Elena quickening her pace, her eyes darting to the shadows. She clutches the bag of candles tightly.",
+		"position": "right",
+		"next": "approach_house"
+	},
+	{
+		"id": "approach_house",
+		"character": "none",
+		"text": "A large Victorian house looms before you, its windows dark except for a faint red glow from an upstairs room. The front porch creaks as you approach.",
+		"position": "center",
+		"next": "meet_mother"
+	},
+	{
+		"id": "meet_mother",
+		"character": "mother",
+		"text": "Elena? Is that you? I was getting worried and... oh. Who is this?",
+		"position": "center",
+		"next": "elena_explains"
+	},
+	{
+		"id": "elena_explains",
+		"character": "daughter",
+		"text": "Mom, this is a traveler. Their car broke down by Helena's shop. I thought they could stay in the spare room tonight.",
+		"position": "right",
+		"next": "mother_decision"
+	},
+	{
+		"id": "mother_decision",
+		"character": "mother",
+		"text": "...",
+		"position": "center",
+		"choices": [
+			{"text": "I can leave if it's a problem", "next": "mother_accepts"},
+			{"text": "Thank you for considering", "next": "mother_accepts"}
+		]
+	},
+	{
+		"id": "mother_accepts",
+		"character": "mother",
+		"text": "No, no... Elena's right. It's not safe out there at night. Come in. But please, stay in your room once night falls. The house... settles strangely after dark.",
+		"position": "center",
+		"next": "enter_house"
+	},
+	{
+		"id": "enter_house",
+		"character": "none",
+		"text": "As you step inside, you notice strange symbols carved into the doorframe, and what looks like salt lines across the threshold. The mother quickly brushes them away with her foot.",
+		"position": "center",
+		"next": "chapter_end"
+	},
+	{
+		"id": "chapter_end",
+		"character": "none",
+		"text": "End of Chapter 1: The Arrival",
+		"position": "center",
+		"next": "start"
 	}
 ]
 
@@ -232,6 +360,8 @@ func _connect_ui():
 		pause_settings_button.process_mode = Node.PROCESS_MODE_ALWAYS
 		pause_settings_button.pressed.connect(func(): 
 			get_tree().paused = false
+			var global = get_node("/root/Global")
+			global.store_current_scene("res://scenes/visual_novel.tscn")
 			get_tree().change_scene_to_file("res://scenes/settings_scene.tscn")
 		)
 	
@@ -428,23 +558,6 @@ func _on_choice_selected(next_id: String):
 	_jump_to_line(next_id)
 
 func _initialize_systems():
-	sanity_system = SanitySystem.new()
-	sanity_system.name = "SanitySystem"
-	add_child(sanity_system)
-	
-	character_manager = CharacterManager.new()
-	character_manager.name = "CharacterManager"
-	add_child(character_manager)
-	
-	save_system = SaveSystem.new()
-	save_system.name = "SaveSystem"
-	add_child(save_system)
-	
-	# Initialize settings system
-	settings_system = SettingsSystem.new()
-	settings_system.name = "SettingsSystem"
-	add_child(settings_system)
-	
 	# Initialize audio system
 	add_child(music_player)
 	music_player.bus = "Music"

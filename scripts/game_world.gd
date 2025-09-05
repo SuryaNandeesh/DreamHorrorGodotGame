@@ -7,21 +7,44 @@ extends Control
 @onready var save_button: Button = $GameUI/GameContent/ActionButtons/SaveButton
 @onready var load_button: Button = $GameUI/GameContent/ActionButtons/LoadButton
 @onready var back_to_menu_button: Button = $GameUI/GameContent/ActionButtons/BackToMenuButton
-@onready var menu_overlay: Panel = $GameUI/MenuOverlay
-@onready var resume_button: Button = $GameUI/MenuOverlay/MenuContent/MenuButtons/ResumeButton
-@onready var settings_button: Button = $GameUI/MenuOverlay/MenuContent/MenuButtons/SettingsButton
-@onready var save_game_button: Button = $GameUI/MenuOverlay/MenuContent/MenuButtons/SaveGameButton
-@onready var load_game_button: Button = $GameUI/MenuOverlay/MenuContent/MenuButtons/LoadGameButton
-@onready var main_menu_button: Button = $GameUI/MenuOverlay/MenuContent/MenuButtons/MainMenuButton
-@onready var quit_button: Button = $GameUI/MenuOverlay/MenuContent/MenuButtons/QuitButton
+@onready var menu_overlay: Panel = null  # Will be created dynamically
 @onready var game_ui_root: Control = $GameUI
 @onready var status_bar: Panel = $GameUI/StatusBar
 
 # Systems
-@onready var save_system = get_node("/root/SaveSystem")
-var settings_system: SettingsSystem
-var character_manager: CharacterManager
-var sanity_system: SanitySystem
+@onready var save_system := get_node("/root/SaveSystem")
+@onready var settings_system := get_node("/root/SettingsSystem")
+@onready var character_manager := get_node("/root/CharacterManager")
+@onready var sanity_system := get_node("/root/SanitySystem")
+
+var active_dialog: AcceptDialog = null
+var pending_messages: Array[Dictionary] = []
+
+func _show_message(title: String, text: String):
+	# If a dialog is already showing, queue this message
+	if active_dialog != null:
+		pending_messages.append({"title": title, "text": text})
+		return
+	
+	# Create and show the dialog
+	var dialog := AcceptDialog.new()
+	dialog.title = title
+	dialog.dialog_text = text
+	dialog.process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	# Connect to handle dialog closing
+	dialog.close_requested.connect(func():
+		active_dialog = null
+		dialog.queue_free()
+		# Show next message if any
+		if pending_messages.size() > 0:
+			var next = pending_messages.pop_front()
+			_show_message(next.title, next.text)
+	)
+	
+	active_dialog = dialog
+	add_child(dialog)
+	dialog.popup_centered()
 
 # Game state
 var is_menu_open: bool = false
@@ -30,24 +53,26 @@ var current_location: String = "home"
 var nearby_characters: Array = []
 
 func _ready():
-	_initialize_systems()
+	# Set process mode for pause menu
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	# Remove any existing menu overlay from the scene
+	if has_node("GameUI/MenuOverlay"):
+		get_node("GameUI/MenuOverlay").queue_free()
+	
+	# Create our new menu
+	menu_overlay = null
+	_initialize_pause_menu()
+	
+	# Check if we're returning from settings with pause state
+	var global = get_node("/root/Global")
+	if global.current_scene.contains("?paused=true"):
+		await get_tree().process_frame
+		_toggle_menu()  # This will set up the pause state properly
+	
 	_connect_ui()
 	_update_player_display()
 	_instance_visual_novel()
-
-func _initialize_systems():
-	# Initialize all systems except SaveSystem (now autoloaded)
-	settings_system = SettingsSystem.new()
-	settings_system.name = "SettingsSystem"
-	add_child(settings_system)
-	
-	character_manager = CharacterManager.new()
-	character_manager.name = "CharacterManager"
-	add_child(character_manager)
-	
-	sanity_system = SanitySystem.new()
-	sanity_system.name = "SanitySystem"
-	add_child(sanity_system)
 	
 	# Connect signals
 	sanity_system.sanity_changed.connect(_on_sanity_changed)
@@ -61,7 +86,111 @@ func _initialize_systems():
 	# Initialize character locations
 	_initialize_character_locations()
 	
-	print("Game world systems initialized successfully")
+	print("Game world initialized successfully")
+
+func _initialize_pause_menu():
+	# Remove any existing menu overlays to prevent duplicates
+	for child in $GameUI.get_children():
+		if child.name == "MenuOverlay" and child != menu_overlay:
+			child.queue_free()
+	
+	# Create pause menu if it doesn't exist
+	if not menu_overlay:
+		menu_overlay = Panel.new()
+		menu_overlay.name = "MenuOverlay"
+		$GameUI.add_child(menu_overlay)
+	
+	# Set up menu overlay
+	menu_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
+	menu_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	menu_overlay.visible = false
+	menu_overlay.self_modulate = Color(0.1, 0.1, 0.1, 0.9)
+	
+	# Make menu overlay fill the screen
+	menu_overlay.size = Vector2(1152, 648)  # Standard Godot default size
+	
+	# Create or get pause content
+	var pause_content = menu_overlay.get_node_or_null("PauseContent")
+	if not pause_content:
+		pause_content = VBoxContainer.new()
+		pause_content.name = "PauseContent"
+		menu_overlay.add_child(pause_content)
+		
+		# Position in bottom right area
+		pause_content.position = Vector2(600, 200)  # Move it to bottom right area
+		pause_content.custom_minimum_size = Vector2(200, 300)
+		pause_content.size = Vector2(200, 300)
+		
+		# Add some spacing between elements
+		pause_content.add_theme_constant_override("separation", 10)
+		
+		# Add title
+		var title = Label.new()
+		title.text = "Pause Menu"
+		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		title.custom_minimum_size = Vector2(200, 50)  # Give title some height
+		title.add_theme_font_size_override("font_size", 24)  # Make title bigger
+		title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER  # Center text vertically
+		pause_content.add_child(title)
+		
+		# Create buttons container
+		var buttons = VBoxContainer.new()
+		buttons.name = "PauseButtons"
+		buttons.custom_minimum_size = Vector2(200, 0)  # Set minimum width
+		buttons.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		buttons.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		buttons.add_theme_constant_override("separation", 10)  # Space between buttons
+		pause_content.add_child(buttons)
+		
+		# Add buttons
+		var button_data = [
+			{"name": "ResumeButton", "text": "Resume"},
+			{"name": "SaveGameButton", "text": "Save Game"},
+			{"name": "LoadGameButton", "text": "Load Game"},
+			{"name": "SettingsButton", "text": "Settings"},
+			{"name": "MainMenuButton", "text": "Main Menu"},
+			{"name": "QuitButton", "text": "Quit Game"}
+		]
+		
+		for data in button_data:
+			var button = Button.new()
+			button.name = data.name
+			button.text = data.text
+			button.custom_minimum_size = Vector2(200, 40)  # Make buttons wider
+			button.size_flags_horizontal = Control.SIZE_FILL
+			button.mouse_filter = Control.MOUSE_FILTER_STOP
+			button.process_mode = Node.PROCESS_MODE_ALWAYS
+			
+			# Add some style to the button
+			button.add_theme_constant_override("outline_size", 2)
+			button.focus_mode = Control.FOCUS_ALL
+			
+			buttons.add_child(button)
+	
+	# Set up all pause menu elements
+	pause_content.process_mode = Node.PROCESS_MODE_ALWAYS
+	pause_content.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# Connect button signals
+	var buttons = pause_content.get_node("PauseButtons")
+	if buttons:
+		for button in buttons.get_children():
+			match button.name:
+				"ResumeButton":
+					button.pressed.connect(_toggle_menu)
+				"SettingsButton":
+					button.pressed.connect(_on_settings)
+				"SaveGameButton":
+					button.pressed.connect(func(): _show_save_slots(true))
+				"LoadGameButton":
+					button.pressed.connect(func(): _show_save_slots(false))
+				"MainMenuButton":
+					button.pressed.connect(_on_back_to_main)
+				"QuitButton":
+					button.pressed.connect(func(): get_tree().quit())
+	
+	# Make sure the pause menu is on top
+	menu_overlay.move_to_front()
 
 func _initialize_character_locations():
 	# Set up initial character locations
@@ -73,17 +202,12 @@ func _initialize_character_locations():
 
 func _connect_ui():
 	# Action buttons
-	save_button.pressed.connect(func(): _show_save_slots(true))
-	load_button.pressed.connect(func(): _show_save_slots(false))
-	back_to_menu_button.pressed.connect(_on_back_to_main)
-	
-	# Menu buttons
-	resume_button.pressed.connect(_toggle_menu)
-	settings_button.pressed.connect(_on_settings)
-	save_game_button.pressed.connect(func(): _show_save_slots(true))
-	load_game_button.pressed.connect(func(): _show_save_slots(false))
-	main_menu_button.pressed.connect(_on_back_to_main)
-	quit_button.pressed.connect(func(): get_tree().quit())
+	if save_button:
+		save_button.pressed.connect(func(): _show_save_slots(true))
+	if load_button:
+		load_button.pressed.connect(func(): _show_save_slots(false))
+	if back_to_menu_button:
+		back_to_menu_button.pressed.connect(_on_back_to_main)
 
 func _update_player_display():
 	# Update player status display
@@ -123,7 +247,7 @@ func _show_save_slots(is_save: bool):
 	var any_save := false
 	for i in range(1, save_system.MAX_SLOTS + 1):
 		var btn := Button.new()
-		var info := save_system.get_save_info(i)
+		var info: Dictionary = save_system.get_save_info(i)
 		var label := ("Save to Slot " + str(i)) if is_save else ("Load Slot " + str(i))
 		
 		if info.exists:
@@ -179,18 +303,53 @@ func _show_save_slots(is_save: bool):
 	dlg.popup_centered()
 
 func _on_settings():
+	# Store current scene before going to settings
+	var global = get_node("/root/Global")
+	if is_menu_open:
+		# If coming from pause menu, store that we're paused
+		global.store_current_scene("res://scenes/game_world.tscn?paused=true")
+	else:
+		global.store_current_scene("res://scenes/game_world.tscn")
 	get_tree().change_scene_to_file("res://scenes/settings_scene.tscn")
 
 func _on_back_to_main():
+	# Make sure we unpause before going to main menu
+	get_tree().paused = false
+	is_menu_open = false
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 func _toggle_menu():
 	is_menu_open = !is_menu_open
-	menu_overlay.visible = is_menu_open
 	
 	if is_menu_open:
+		# Make sure we have a valid menu overlay
+		if not is_instance_valid(menu_overlay) or not menu_overlay.is_inside_tree():
+			_initialize_pause_menu()
+		
+		# Show pause menu
+		menu_overlay.visible = true
+		menu_overlay.show()
+		menu_overlay.move_to_front()
+		
+		# Make sure all pause menu buttons are interactive
+		var pause_content = menu_overlay.get_node_or_null("PauseContent")
+		if pause_content:
+			pause_content.show()
+			pause_content.mouse_filter = Control.MOUSE_FILTER_STOP
+			var buttons = pause_content.get_node_or_null("PauseButtons")
+			if buttons:
+				for button in buttons.get_children():
+					if button is Button:
+						button.mouse_filter = Control.MOUSE_FILTER_STOP
+		
+		# Pause the game
 		get_tree().paused = true
 	else:
+		# Hide pause menu if it exists
+		if is_instance_valid(menu_overlay) and menu_overlay.is_inside_tree():
+			menu_overlay.visible = false
+		
+		# Unpause the game
 		get_tree().paused = false
 
 func _on_sanity_changed(new_sanity: float, old_sanity: float):
@@ -201,20 +360,19 @@ func _on_sanity_changed(new_sanity: float, old_sanity: float):
 func _input(event):
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
-			KEY_M:
-				_toggle_menu()
-			KEY_ESCAPE:
+			KEY_M, KEY_ESCAPE:
 				if is_menu_open:
-					_toggle_menu()
+					_toggle_menu()  # Close menu
 				else:
-					_on_back_to_main()
+					_toggle_menu()  # Open menu
+				get_viewport().set_input_as_handled()
 			KEY_F5:
 				# Quick save to last used slot or slot 1
 				var quick_slot := 1  # Default quick save slot
 				# Find the most recent save slot
 				var latest_time := 0
 				for slot in range(1, save_system.MAX_SLOTS + 1):
-					var info := save_system.get_save_info(slot)
+					var info: Dictionary = save_system.get_save_info(slot)
 					if info.exists:
 						var save_time = Time.get_unix_time_from_datetime_string(info.save_date)
 						if save_time > latest_time:
@@ -231,7 +389,7 @@ func _input(event):
 				var latest_slot := -1
 				var latest_time := 0
 				for slot in range(1, save_system.MAX_SLOTS + 1):
-					var info := save_system.get_save_info(slot)
+					var info: Dictionary = save_system.get_save_info(slot)
 					if info.exists:
 						var save_time = Time.get_unix_time_from_datetime_string(info.save_date)
 						if save_time > latest_time:
