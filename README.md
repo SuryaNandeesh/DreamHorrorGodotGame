@@ -2,6 +2,22 @@
 
 A psychological horror visual novel built in Godot 4, focusing on family dynamics and mysterious events in a small town.
 
+## 👥 **Team Members**
+- [Your name/username] - Lead Developer
+- [Add other team members and their roles]
+
+## 📸 **Screenshots**
+![Main Menu](screenshots/main_menu.png)
+*Main menu interface with modern design*
+
+![Game World](screenshots/game_world.png)
+*In-game dialogue system with character portraits*
+
+![Settings](screenshots/settings.png)
+*Settings menu with customizable options*
+
+**Note:** To add screenshots, create a `screenshots` directory and add your game screenshots there.
+
 ## 🌟 **Key Features**
 
 ### 📖 **Visual Novel System**
@@ -27,10 +43,32 @@ A psychological horror visual novel built in Godot 4, focusing on family dynamic
 - Seamless scene transitions
 - Content warning splash screen
 
-### ⌨️ **Menu Controls**
-- Press **M** or **ESC** key to toggle pause menu
-- Hide dialogue with **H** key
-- Game pauses when menu is open
+## 🚀 **Installation & Setup**
+
+### **Prerequisites**
+- [Godot 4.x](https://godotengine.org/download) (4.0 or higher)
+- Basic understanding of GDScript (for development)
+- 2GB RAM minimum
+- Graphics card with OpenGL 3.3 / OpenGL ES 3.0 support
+
+### **Installation Steps**
+1. Download and install Godot 4.x from [godotengine.org](https://godotengine.org/download)
+2. Clone this repository:
+   ```bash
+   git clone https://github.com/[your-username]/godot-horror-game.git
+   ```
+3. Open Godot Engine
+4. Click "Import" and navigate to the downloaded project folder
+5. Select the `project.godot` file
+6. Click "Import & Edit"
+7. Press F5 or click the "Play" button to run the game
+
+### **Controls**
+- **M/ESC**: Toggle pause menu
+- **H**: Toggle dialogue box visibility
+- **F5**: Quick save
+- **F9**: Quick load
+- **Mouse**: Navigate UI and make selections
 
 ## 🎭 **Characters**
 
@@ -56,31 +94,6 @@ A psychological horror visual novel built in Godot 4, focusing on family dynamic
 - `settings_scene.tscn` - Settings menu
 - `visual_novel.tscn` - Story progression system
 
-### **Key Scripts**
-- `character_manager.gd` - Character dialogue and interactions
-- `novel_manager.gd` - Visual novel system
-- `game_world.gd` - Main game world
-- `main_menu.gd` - Menu system with save management
-- `splash.gd` - Splash screen with fade transitions
-
-## 🚀 **Getting Started**
-
-### **Prerequisites**
-- Godot 4.x
-- Basic understanding of GDScript
-
-### **Installation**
-1. Clone or download the project
-2. Open in Godot 4.x
-3. Run the project
-
-### **Controls**
-- **M/ESC**: Toggle pause menu
-- **H**: Toggle dialogue box visibility
-- **F5**: Quick save
-- **F9**: Quick load
-- **Mouse**: Navigate UI and make selections
-
 ## 📁 **File Structure**
 
 ```
@@ -102,19 +115,10 @@ godot-horror-game/
 └── project.godot            # Project configuration
 ```
 
-## 🎭 **Story Elements**
+## 🎵 **Credits**
 
-### **Character Interactions**
-- Deep, meaningful conversations with family members
-- Each character has unique dialogue paths
-- Personal and casual conversation options
-- Rich character backgrounds and personalities
-
-### **Dialogue System**
-- Clean, modern dialogue box design
-- Character portraits appear during conversations
-- Option to hide dialogue box for better immersion
-- Random dialogue variation for replayability
+### **Music**
+- Dark despair guitar vibe by NomisYlad -- https://freesound.org/s/822772/ -- License: Attribution 4.0
 
 ## 🔮 **Future Enhancements**
 
@@ -124,32 +128,16 @@ godot-horror-game/
 - **Background Transitions**: Smooth scene changes
 - **Sound Effects**: Enhanced audio experience
 
-### **Modding Support**
-- **Character Creation**: Easy addition of new characters
-- **Story Expansion**: Modular dialogue system
-- **Custom Backgrounds**: Support for new locations
-- **Translation Support**: Easy localization
+## 📝 **Contributing**
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📝 **Development Notes**
+## 📄 **License**
+This project is licensed under the [LICENSE] - see the LICENSE file for details.
 
-### **Key Design Decisions**
-- **Visual Novel Focus**: Pure storytelling experience
-- **Modern UI**: Clean, intuitive interface
-- **Save System**: Flexible multi-slot system
-- **Character Design**: Deep, complex personalities
-
-### **Technical Considerations**
-- **System Integration**: Seamless component interaction
-- **Performance**: Efficient resource management
-- **Scalability**: Easy content addition
-- **Maintainability**: Clear code structure
-
-## 🎉 **Conclusion**
-
-This visual novel creates an immersive horror experience through storytelling and character interaction. The focus on narrative and atmosphere, combined with modern UI design and robust save system, provides players with an engaging and memorable experience.
-
-## **CREDIT FOR MUSIC**
 ---
-Dark despair guitar vibe by NomisYlad -- https://freesound.org/s/822772/ -- License: Attribution 4.0
 
 **Note**: This game focuses on psychological horror through storytelling rather than combat or action elements. The visual novel format allows for deep character development and atmospheric storytelling.
