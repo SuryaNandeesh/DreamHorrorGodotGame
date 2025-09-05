@@ -7,13 +7,15 @@ A psychological horror visual novel built in Godot 4, focusing on family dynamic
 - [Felipe Gonzales] - Lead Artist (not AI)
 
 ## 📸 **Screenshots**
-![Main Menu](screenshots/main_menu.png)
+<img width="664" height="489" alt="menuscreenshot" src="https://github.com/user-attachments/assets/d8b7ee7e-4c50-4332-a3eb-a5aaeb05ae18" />
+
 *Main menu interface with modern design*
 
-![Game World](screenshots/game_world.png)
+<img width="1274" height="721" alt="gameplayscreenshot" src="https://github.com/user-attachments/assets/755f6925-1842-4571-8d67-9e9b3816b305" />
 *In-game dialogue system with character portraits*
 
-![Settings](screenshots/settings.png)
+<img width="708" height="435" alt="settingsscreenshot" src="https://github.com/user-attachments/assets/f67167df-b1d3-430c-9438-4822d9173e9d" />
+
 *Settings menu with customizable options*
 
 **Note:** To add screenshots, create a `screenshots` directory and add your game screenshots there.
@@ -78,42 +80,6 @@ A psychological horror visual novel built in Godot 4, focusing on family dynamic
 - **Mother**: Mysterious past she won't discuss
 - **Father**: Hardworking farmer trying to keep family together
 - **Shopkeeper**: Enigmatic figure with knowledge of the town's history
-
-## 🏗️ **Technical Architecture**
-
-### **Core Systems**
-- **CharacterManager**: Manages character dialogue and interactions
-- **NovelManager**: Handles visual novel flow and UI
-- **SaveSystem**: Multi-slot save/load functionality
-- **SettingsSystem**: Config file-based settings management
-
-### **Scene Structure**
-- `splash.tscn` - Content warning screen
-- `main_menu.tscn` - Main menu with save management
-- `game_world.tscn` - Main game interface
-- `settings_scene.tscn` - Settings menu
-- `visual_novel.tscn` - Story progression system
-
-## 📁 **File Structure**
-
-```
-godot-horror-game/
-├── scenes/
-│   ├── splash.tscn            # Content warning screen
-│   ├── main_menu.tscn        # Main menu
-│   ├── game_world.tscn       # Main game interface
-│   ├── settings_scene.tscn   # Settings menu
-│   └── visual_novel.tscn     # Story system
-├── scripts/
-│   ├── character_manager.gd  # Character interactions
-│   ├── novel_manager.gd      # Visual novel system
-│   ├── game_world.gd         # Main world
-│   ├── main_menu.gd         # Menu system
-│   ├── splash.gd            # Splash screen
-│   ├── save_system.gd       # Save/load functionality
-│   └── settings_system.gd   # Settings management
-└── project.godot            # Project configuration
-```
 
 ## 🎵 **Credits**
 
